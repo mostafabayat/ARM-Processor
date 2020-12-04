@@ -5,9 +5,9 @@ module Register(clk, rst, in, out);
 	input wire[REGISTER_SIZE-1:0] in;
 	output reg[REGISTER_SIZE-1:0] out;
 
-    always @(posedge clk) begin
-        if (rst) out = 0;
-	else out = in;
-    end
+	always @(posedge clk) begin
+		if (rst) out = 0;
+		else out = in;
+	end
 
 endmodule // Register

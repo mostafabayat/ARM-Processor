@@ -5,9 +5,13 @@ module InstructionFetch(clk, rst, freeze, branchTaken, branchAddress, PC, instru
 	input wire[31:0] branchAddress;
 	output wire[31:0] PC, instruction;
 
-	wire[31:0] nextPC;
-	PCCounter PCC(.clk(clk), .rst(rst), .in(nextPC), .freeze(freeze), .out(nextPC));
+	wire[31:0] PCIn;
+	wire[31:0] nextPC, PCOut;
+	MUX beforePCMux(.select(branchTaken), .in0(nextPC), .in1(branchAddress), .out(PCIn));
+	PC PCRegister(.clk(clk), .rst(rst), .in(PCIn), .freeze(freeze), .out(PCOut));
+	Adder PCAdder(.in1(32'd4), .in2(PCOut), .out(nextPC));
 	assign PC = nextPC;
-	
-	
-endmodule // IF
+
+	instructionMemory instructionMemory(.address(PCOut), .instruction(instruction));
+
+endmodule

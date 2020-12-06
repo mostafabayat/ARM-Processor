@@ -1,6 +1,6 @@
 
 
-module instruction_memory(address, instruction);
+module instructionMemory(address, instruction);
 	input wire[31:0] address;
 	output reg[31:0] instruction;
 

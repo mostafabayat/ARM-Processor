@@ -56,6 +56,23 @@ module ARM(clk, rst);
 										.shiftOperand(shiftOperandEXE), .signedImmediate(signedImmediateEXE), .destination(destinationEXE),
 										.N(NEXE), .Z(ZEXE), .C(CEXE), .V(VEXE));
 
+	//Execution
+	wire[31:0] ALUResultEXE;
+	wire NOut, ZOut, COut, VOut;
+	Execution execution(.clk(clk), .executeCommand(executeCommandEXE), .memRead(memReadEXE), .memWrite(memReadEXE),
+	 		.PC(PCEXE), .reg1Val(reg1ValEXE), .reg2Val(reg2ValEXE),
+			.immediate(immediateEXE), .N(NEXE), .Z(ZEXE), .C(CEXE), .V(VEXE), .shiftOperand(shiftOperandEXE),
+			.signedImmediate(signedImmediateEXE), .ALUResult(ALUResultEXE),
+			.branchAddress(branchAddress), .NOut(NOut), .ZOut(ZOut), .COut(COut), .VOut(VOut));
 
 
-endmodule // ARM
+	//Register Unit EXE to MEM
+	wire writeBackEnMEM, memReadMEM, memWriteMEM;
+	wire[31:0] ALUResultMEM;
+	wire[3:0] destinationMEM;
+	RegisterUnitEXE2MEM registerUnitEXE2MEM(.clk(clk), .rst(rst), .writeBackEnIn(writeBackEnEXE),
+	 		.memReadIn(memReadEXE), .memWriteIn(memWriteEXE), .ALUResultIn(ALUResultEXE),
+			.destinationIn(destinationEXE), .writeBackEn(writeBackEnMEM), .memRead(memReadMEM),
+			.memWrite(memWriteMEM), .ALUResult(ALUResultMEM), .destination(destinationMEM));
+
+endmodule

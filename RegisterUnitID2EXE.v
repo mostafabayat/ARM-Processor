@@ -24,13 +24,6 @@ module RegisterUnitID2EXE(clk, rst, flush,
 	output reg[23:0] signedImmediate;
 	output reg[3:0] destination;
 
-	assign inputs = {writeBackEn, memRead, memWrite,
-										executeCommand, s, branch, PC, reg1Val, reg2Val, immediate,
-										shiftOperand, signedImmediate, destination, N, Z, C, V};
-	assign outputs = {writeBackEn, memRead, memWrite,
-										executeCommand, s, branch, PC, reg1Val, reg2Val, immediate,
-										shiftOperand, signedImmediate, destination, N, Z, C, V};
-
 	always @(posedge clk) begin
 		{writeBackEn, memRead, memWrite, executeCommand, s, branch, PC, reg1Val, reg2Val,
 		 immediate, shiftOperand, signedImmediate, destination, N, Z, C, V} =
@@ -39,4 +32,6 @@ module RegisterUnitID2EXE(clk, rst, flush,
 				reg1ValIn, reg2ValIn, immediateIn, shiftOperandIn, signedImmediateIn,
 				 destinationIn, NIn, ZIn, CIn, VIn};
 	end
+
+
 endmodule

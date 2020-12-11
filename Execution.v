@@ -14,12 +14,13 @@ module Execution(clk, executeCommand, memRead, memWrite, PC, reg1Val, reg2Val,
 	output wire[31:0] ALUResult, branchAddress;
 	output wire NOut, ZOut, COut, VOut;
 
-	wire[31:0] aluIn2Val;
+	wire[31:0] aluIn2Val, extendedSignImmediate;
 	ALU alu(.ALUOperation(executeCommand), .in1(reg1Val), .in2(aluIn2Val), .carry(C),
 	 	.NOut(NOut), .ZOut(ZOut), .COut(COut), .VOut(VOut), .out(ALUResult));
-	assign branchAddress = PC + {{6{signedImmediate[23]}}, signedImmediate} << 2;
+	assign extendedSignImmediate = {{6{signedImmediate[23]}}, signedImmediate} << 2;
+	assign branchAddress = PC + extendedSignImmediate;
 	Val2Generator val2Generator(.reg2Val(reg2Val), .immediate(immediate),
-	 	.shiftOperand(shiftOperand), .memEnable(memRead | memWrite), .aluIn2Val(aluIn2Val));
+	 	.shiftOperand(shiftOperand), .memEnable(memRead || memWrite), .aluIn2Val(aluIn2Val));
 
 
 endmodule

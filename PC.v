@@ -1,5 +1,5 @@
 
-module PCCounter(clk, rst, in, freeze, out);
+module PC(clk, rst, in, freeze, out);
 	input wire clk, rst;
 	input wire freeze;
 	input wire[31:0] in;

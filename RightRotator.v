@@ -1,7 +1,7 @@
 
 module RightRotator(in, rotation, out);
 	input wire[31:0] in;
-	input wire[5:0] rotation;
+	input wire[4:0] rotation;
 	output reg[31:0] out;
 
 	integer r;

@@ -34,7 +34,7 @@
 //`define B		6'b00
 
 
-module Controller(opCode, mode, s, executeCommand, memRead, memWrite, writeBackEn, branch, sOut);
+module ControlUnit(opCode, mode, s, executeCommand, memRead, memWrite, writeBackEn, branch, sOut);
 	input wire s;
 	input wire[1:0] mode;
 	input wire[3:0] opCode;
@@ -54,8 +54,8 @@ module Controller(opCode, mode, s, executeCommand, memRead, memWrite, writeBackE
 		(mop == `AND) ? {`ALU_AND, 2'b00, 1'b1, 1'b0, s} :
 		(mop == `ORR) ? {`ALU_ORR, 2'b00, 1'b1, 1'b0, s} :
 		(mop == `EOR) ? {`ALU_EOR, 2'b00, 1'b1, 1'b0, s} :
-		(mop == `CMP) ? {`ALU_CMP, 2'b00, 1'b1, 1'b0, s} :
-		(mop == `TST) ? {`ALU_TST, 2'b00, 1'b1, 1'b0, s} :
+		(mop == `CMP) ? {`ALU_CMP, 2'b00, 1'b0, 1'b0, s} :
+		(mop == `TST) ? {`ALU_TST, 2'b00, 1'b0, 1'b0, s} :
 		(mop == `LDR) ? {`ALU_LDR, s, ~s, s,    1'b0, s} :
 		(mop == `STR) ? {`ALU_STR, s, ~s, s,    1'b0, s} :
 		({mode, opCode[3]} == 3'b100) ? 9'b0000_00_0_1_0 : 9'd0;

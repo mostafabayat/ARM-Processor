@@ -6,18 +6,19 @@ module ARM(clk, rst);
 	wire[31:0] branchAddress;
 	wire[31:0] PCIF, instructionIF;
 	InstructionFetch instructionFetch(.clk(clk), .rst(rst), .freeze(freeze),
-	 					.branchTaken(branchTaken), .branchAddress(branchAddress), .PC(PCIF), .instruction(instructionIF));
+	 		.branchTaken(branchTaken), .branchAddress(branchAddress), .PC(PCIF), .instruction(instructionIF));
 
 	//Register Unit IF to ID
 	wire flush;
 	wire[31:0] PCID, instructionID;
-	RegisterUnitIF2ID registerUnitIF2ID(.clk(clk), .rst(rst), .freeze(freeze), .flush(flush), .PCIn(PCIF), .instructionIn(instructionIF), .PC(PCID), .instruction(instructionID));
+	RegisterUnitIF2ID registerUnitIF2ID(.clk(clk), .rst(rst), .freeze(freeze), .flush(flush),
+			.PCIn(PCIF), .instructionIn(instructionIF), .PC(PCID), .instruction(instructionID));
 
 	//InstructionDecode
 	wire NID, ZID, CID, VID;
-	wire[3:0] destWBID;
-	wire[31:0] resultWBID;
-	wire writeBackEnWBID;
+	wire[3:0] destinationWB;
+	wire[31:0] resultWB;
+	wire writeBackEnWB;
 	wire writeBackEnID, memReadID, memWriteID, sID, branchID;
 	wire[3:0] executeCommandID;
 	wire[31:0] reg1ValID, reg2ValID;
@@ -26,10 +27,10 @@ module ARM(clk, rst);
 	wire[23:0] signedImmediateID;
 	wire[3:0] destinationID;
 	InstructionDecode instructionDecode(.clk(clk), .rst(rst), .instruction(instructionID), .N(NID), .Z(ZID), .C(CID), .V(VID),
-	 					.destWB(destWBID), .resultWB(resultWBID), .writeBackEnWB(writeBackEnWBID),
-						.writeBackEn(writeBackEnID), .memRead(memReadID), .memWrite(memWriteID), .executeCommand(executeCommandID),
-						.s(sID), .branch(branchID), .reg1Val(reg1ValID), .reg2Val(reg2ValID),
-						.immediate(immediateID), .shiftOperand(shiftOperandID), .signedImmediate(signedImmediateID), .destination(destinationID));
+	 		.destWB(destinationWB), .resultWB(resultWB), .writeBackEnWB(writeBackEnWB),
+			.writeBackEn(writeBackEnID), .memRead(memReadID), .memWrite(memWriteID), .executeCommand(executeCommandID),
+			.s(sID), .branch(branchID), .reg1Val(reg1ValID), .reg2Val(reg2ValID),
+			.immediate(immediateID), .shiftOperand(shiftOperandID), .signedImmediate(signedImmediateID), .destination(destinationID));
 
 	//Register Unit ID to EXE
 	wire NEXE, ZEXE, CEXE, VEXE;
@@ -45,16 +46,16 @@ module ARM(clk, rst);
 	wire[23:0] signedImmediateEXE;
 	wire[3:0] destinationEXE;
 	RegisterUnitID2EXE registerUnitID2EXE(.clk(clk), .rst(rst), .flush(flush),
-										.writeBackEnIn(writeBackEnID), .memReadIn(memReadID), .memWriteIn(memWriteID),
-										.executeCommandIn(executeCommandID), .sIn(sID), .branchIn(branchID),
-										.PCIn(PCID), .reg1ValIn(reg1ValID), .reg2ValIn(reg2ValID), .immediateIn(immediateID),
-										.shiftOperandIn(shiftOperandID), .signedImmediateIn(signedImmediateID),
-										.destinationIn(destinationID), .NIn(NID), .ZIn(ZID), .CIn(CID), .VIn(VID),
-										.writeBackEn(writeBackEnEXE), .memRead(memReadEXE), .memWrite(memWriteEXE),
-										.executeCommand(executeCommandEXE), .s(sEXE), .branch(branchEXE),
-										.PC(PCEXE), .reg1Val(reg1ValEXE), .reg2Val(reg2ValEXE), .immediate(immediateEXE),
-										.shiftOperand(shiftOperandEXE), .signedImmediate(signedImmediateEXE), .destination(destinationEXE),
-										.N(NEXE), .Z(ZEXE), .C(CEXE), .V(VEXE));
+			.writeBackEnIn(writeBackEnID), .memReadIn(memReadID), .memWriteIn(memWriteID),
+			.executeCommandIn(executeCommandID), .sIn(sID), .branchIn(branchID),
+			.PCIn(PCID), .reg1ValIn(reg1ValID), .reg2ValIn(reg2ValID), .immediateIn(immediateID),
+			.shiftOperandIn(shiftOperandID), .signedImmediateIn(signedImmediateID),
+			.destinationIn(destinationID), .NIn(NID), .ZIn(ZID), .CIn(CID), .VIn(VID),
+			.writeBackEn(writeBackEnEXE), .memRead(memReadEXE), .memWrite(memWriteEXE),
+			.executeCommand(executeCommandEXE), .s(sEXE), .branch(branchEXE),
+			.PC(PCEXE), .reg1Val(reg1ValEXE), .reg2Val(reg2ValEXE), .immediate(immediateEXE),
+			.shiftOperand(shiftOperandEXE), .signedImmediate(signedImmediateEXE), .destination(destinationEXE),
+			.N(NEXE), .Z(ZEXE), .C(CEXE), .V(VEXE));
 
 	//Execution
 	wire[31:0] ALUResultEXE;
@@ -65,6 +66,9 @@ module ARM(clk, rst);
 			.signedImmediate(signedImmediateEXE), .ALUResult(ALUResultEXE),
 			.branchAddress(branchAddress), .NOut(NOut), .ZOut(ZOut), .COut(COut), .VOut(VOut));
 
+	//Status Register
+	StatusRegister statusRegister(.clk(clk), .rst(rst), .N(NOut), .Z(ZOut), .C(COut), .V(VOut), .s(sEXE),
+	 		.NOut(NID), .ZOut(ZID), .COut(CID), .VOut(VID));
 
 	//Register Unit EXE to MEM
 	wire writeBackEnMEM, memReadMEM, memWriteMEM;
@@ -72,7 +76,23 @@ module ARM(clk, rst);
 	wire[3:0] destinationMEM;
 	RegisterUnitEXE2MEM registerUnitEXE2MEM(.clk(clk), .rst(rst), .writeBackEnIn(writeBackEnEXE),
 	 		.memReadIn(memReadEXE), .memWriteIn(memWriteEXE), .ALUResultIn(ALUResultEXE),
-			.destinationIn(destinationEXE), .writeBackEn(writeBackEnMEM), .memRead(memReadMEM),
-			.memWrite(memWriteMEM), .ALUResult(ALUResultMEM), .destination(destinationMEM));
+			.destinationIn(destinationEXE), .reg2ValIn(reg2ValEXE),
+			.writeBackEn(writeBackEnMEM), .memRead(memReadMEM), .memWrite(memWriteMEM),
+			.ALUResult(ALUResultMEM), .destination(destinationMEM), .reg2Val(reg2ValMEM));
 
+	//Data Memory
+	wire[31:0] memOutMEM;
+	DataMemory dataMemory(.clk(clk), .rst(rst), .memRead(memReadMEM), .memWrite(memWriteMEM),
+	 		.address(ALUResultMEM), .data(reg2ValMEM), .memOut(memOutMEM));
+
+	//Register Unit MEM to WB
+	wire memReadWB;
+	wire[31:0] addressWB, memOutWB;
+	RegisterUnitMEM2WB registerUnitMEM2WB(.clk(clk), .rst(rst), .writeBackEnIn(writeBackEnMEM),
+			.memReadIn(memReadMEM), .addressIn(ALUResultMEM), .memOutIn(memOutMEM), .destinationIn(destinationMEM),
+			.writeBackEn(writeBackEnWB), .memRead(memReadWB), .address(addressWB),
+			.memOut(memOutWB), .destination(destinationWB));
+
+	//Write Back
+	WriteBack writeBack(.memRead(memReadWB), .ALUResult(addressWB), .memOut(memOutWB), .result(resultWB));
 endmodule

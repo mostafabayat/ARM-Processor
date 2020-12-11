@@ -1,11 +1,11 @@
 
 module RegisterUnitID2EXE(clk, rst, flush,
-									writeBackEnIn, memReadIn, memWriteIn,
-									executeCommandIn, sIn, branchIn, PCIn, reg1ValIn, reg2ValIn, immediateIn,
-									shiftOperandIn, signedImmediateIn, destinationIn, NIn, ZIn, CIn, VIn,
-									writeBackEn, memRead, memWrite,
-									executeCommand, s, branch, PC, reg1Val, reg2Val, immediate,
-									shiftOperand, signedImmediate, destination, N, Z, C, V );
+		writeBackEnIn, memReadIn, memWriteIn,
+		executeCommandIn, sIn, branchIn, PCIn, reg1ValIn, reg2ValIn, immediateIn,
+		shiftOperandIn, signedImmediateIn, destinationIn, NIn, ZIn, CIn, VIn,
+		writeBackEn, memRead, memWrite,
+		executeCommand, s, branch, PC, reg1Val, reg2Val, immediate,
+		shiftOperand, signedImmediate, destination, N, Z, C, V );
 	input wire clk, rst;
 	input wire flush;
 	input wire writeBackEnIn, memReadIn, memWriteIn, sIn, branchIn, immediateIn;

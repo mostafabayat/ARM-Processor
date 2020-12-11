@@ -36,7 +36,7 @@ module ALU(ALUOperation, in1, in2, carry, out, NOut, ZOut, COut, VOut);
 		end
 		`OP_ADC : begin
 			{COut, out} <= in1 + in2 + carry;
-			// VOut <= (in1[31] == in2[31]) & (in1[31] != out[31]);
+			VOut <= (in1[31] == in2[31]) & (in1[31] != out[31]);
 		end
 		`OP_SUB : begin
 			{COut, out} <= in1 - in2;
@@ -44,7 +44,7 @@ module ALU(ALUOperation, in1, in2, carry, out, NOut, ZOut, COut, VOut);
 		end
 		`OP_SBC : begin
 			{COut, out} <= in1 - in2 - 1;
-		// VOut <= (in1[31] == in2[31]) & (in1[31] != out[31]);
+			VOut <= (in1[31] != in2[31]) & (in1[31] != out[31]);
 		end
 		`OP_AND : begin
 			out <= in1 & in2;

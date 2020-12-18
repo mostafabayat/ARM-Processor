@@ -1,8 +1,8 @@
 
-module Execution(clk, executeCommand, memRead, memWrite, PC, reg1Val, reg2Val,
+module Execution(executeCommand, memRead, memWrite, PC, reg1Val, reg2Val,
 		immediate, N, Z, C, V, shiftOperand, signedImmediate, ALUResult,
 		branchAddress, NOut, ZOut, COut, VOut);
-	input wire clk;
+
 	input wire[3:0] executeCommand;
 	input wire memRead, memWrite;
 	input wire[31:0] PC;

@@ -3,7 +3,7 @@
 module ARMTB();
   reg clk = 0;
   reg rst = 0;
-  ARM ARMInstance(.clk(clk), .rst(rst));
+  ARM ARMInstance(.clk(clk), .rst(rst), .forwardEn(1'b1));
 
 
   initial begin

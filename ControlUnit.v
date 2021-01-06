@@ -13,6 +13,7 @@
 `define TST		6'b00_1000
 `define LDR		6'b01_0100
 `define STR		6'b01_0100
+`define STK		6'b01_1111
 //`define B		6'b00
 
 
@@ -31,34 +32,36 @@
 `define ALU_TST		4'b0110
 `define ALU_LDR		4'b0010
 `define ALU_STR		4'b0010
+`define ALU_STK		4'b0010
 //`define B		6'b00
 
 
-module ControlUnit(opCode, mode, s, executeCommand, memRead, memWrite, writeBackEn, branch, sOut);
+module ControlUnit(opCode, mode, s, executeCommand, memRead, memWrite, writeBackEn, branch, sOut, pushEn, popEn);
 	input wire s;
 	input wire[1:0] mode;
 	input wire[3:0] opCode;
 	output wire[3:0] executeCommand;
-	output wire memRead, memWrite, writeBackEn, branch, sOut;
+	output wire memRead, memWrite, writeBackEn, branch, sOut, pushEn, popEn;
 
 	wire[5:0] mop;
 
 	assign mop = {mode, opCode};
-	assign {executeCommand, memRead, memWrite, writeBackEn, branch, sOut} =
-		(mop == `MOV) ? {`ALU_MOV, 2'b00, 1'b1, 1'b0, s} :
-		(mop == `MVN) ? {`ALU_MVN, 2'b00, 1'b1, 1'b0, s} :
-		(mop == `ADD) ? {`ALU_ADD, 2'b00, 1'b1, 1'b0, s} :
-		(mop == `ADC) ? {`ALU_ADC, 2'b00, 1'b1, 1'b0, s} :
-		(mop == `SUB) ? {`ALU_SUB, 2'b00, 1'b1, 1'b0, s} :
-		(mop == `SBC) ? {`ALU_SBC, 2'b00, 1'b1, 1'b0, s} :
-		(mop == `AND) ? {`ALU_AND, 2'b00, 1'b1, 1'b0, s} :
-		(mop == `ORR) ? {`ALU_ORR, 2'b00, 1'b1, 1'b0, s} :
-		(mop == `EOR) ? {`ALU_EOR, 2'b00, 1'b1, 1'b0, s} :
-		(mop == `CMP) ? {`ALU_CMP, 2'b00, 1'b0, 1'b0, s} :
-		(mop == `TST) ? {`ALU_TST, 2'b00, 1'b0, 1'b0, s} :
-		(mop == `LDR) ? {`ALU_LDR, s, ~s, s,    1'b0, s} :
-		(mop == `STR) ? {`ALU_STR, s, ~s, s,    1'b0, s} :
-		({mode, opCode[3]} == 3'b100) ? 9'b0000_00_0_1_0 : 9'd0;
+	assign {executeCommand, memRead, memWrite, writeBackEn, branch, sOut, pushEn, popEn} =
+		(mop == `MOV) ? {`ALU_MOV, 2'b00, 1'b1, 1'b0, s, 2'b00} :
+		(mop == `MVN) ? {`ALU_MVN, 2'b00, 1'b1, 1'b0, s, 2'b00} :
+		(mop == `ADD) ? {`ALU_ADD, 2'b00, 1'b1, 1'b0, s, 2'b00} :
+		(mop == `ADC) ? {`ALU_ADC, 2'b00, 1'b1, 1'b0, s, 2'b00} :
+		(mop == `SUB) ? {`ALU_SUB, 2'b00, 1'b1, 1'b0, s, 2'b00} :
+		(mop == `SBC) ? {`ALU_SBC, 2'b00, 1'b1, 1'b0, s, 2'b00} :
+		(mop == `AND) ? {`ALU_AND, 2'b00, 1'b1, 1'b0, s, 2'b00} :
+		(mop == `ORR) ? {`ALU_ORR, 2'b00, 1'b1, 1'b0, s, 2'b00} :
+		(mop == `EOR) ? {`ALU_EOR, 2'b00, 1'b1, 1'b0, s, 2'b00} :
+		(mop == `CMP) ? {`ALU_CMP, 2'b00, 1'b0, 1'b0, s, 2'b00} :
+		(mop == `TST) ? {`ALU_TST, 2'b00, 1'b0, 1'b0, s, 2'b00} :
+		(mop == `LDR) ? {`ALU_LDR, s, ~s, s,    1'b0, s, 2'b00} :
+		(mop == `STR) ? {`ALU_STR, s, ~s, s,    1'b0, s, 2'b00} :
+		(mop == `STK) ? {`ALU_STK, s, ~s, s,    1'b0, s, ~s, s} :
+		({mode, opCode[3]} == 3'b100) ? 11'b0000_00_0_1_0_00 : 11'd0;
 
 
 endmodule

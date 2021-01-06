@@ -19,8 +19,8 @@ module ARM(clk, rst);
 	wire NID, ZID, CID, VID;
 	wire[3:0] destinationWB;
 	wire[31:0] resultWB;
-	wire writeBackEnWB;
-	wire writeBackEnID, memReadID, memWriteID, sID, branchID;
+	wire writeBackEnWB, pushEnWB, popEnWB;
+	wire writeBackEnID, memReadID, memWriteID, sID, branchID, pushEnID, popEnID;
 	wire[3:0] executeCommandID;
 	wire[31:0] reg1ValID, reg2ValID;
 	wire immediateID;
@@ -29,6 +29,7 @@ module ARM(clk, rst);
 	wire[3:0] destinationID, src2ID;
 	InstructionDecode instructionDecode(.clk(clk), .rst(rst), .instruction(instructionID), .N(NID), .Z(ZID), .C(CID), .V(VID),
 	 		.destWB(destinationWB), .resultWB(resultWB), .freeze(freeze), .writeBackEnWB(writeBackEnWB),
+			.pushEnWB(pushEnWB), .popEnWB(popEnWB), .pushEn(pushEnID), .popEn(popEnID),
 			.writeBackEn(writeBackEnID), .memRead(memReadID), .memWrite(memWriteID), .executeCommand(executeCommandID),
 			.s(sID), .branch(branchID), .reg1Val(reg1ValID), .reg2Val(reg2ValID),
 			.immediate(immediateID), .shiftOperand(shiftOperandID), .signedImmediate(signedImmediateID),
@@ -40,12 +41,13 @@ module ARM(clk, rst);
 	wire writeBackEnEXE, memReadEXE, memWriteEXE, sEXE;
 	wire[3:0] executeCommandEXE;
 	wire[31:0] reg1ValEXE, reg2ValEXE;
-	wire immediateEXE;
+	wire immediateEXE, pushEnEXE, popEnEXE;
 	wire[11:0] shiftOperandEXE;
 	wire[23:0] signedImmediateEXE;
 	wire[3:0] destinationEXE;
 	RegisterUnitID2EXE registerUnitID2EXE(.clk(clk), .rst(rst), .flush(flush),
 			.writeBackEnIn(writeBackEnID), .memReadIn(memReadID), .memWriteIn(memWriteID),
+			.pushEnIn(pushEnID), .popEnIn(popEnID), .pushEn(pushEnEXE), .popEn(popEnEXE),
 			.executeCommandIn(executeCommandID), .sIn(sID), .branchIn(branchID),
 			.PCIn(PCID), .reg1ValIn(reg1ValID), .reg2ValIn(reg2ValID), .immediateIn(immediateID),
 			.shiftOperandIn(shiftOperandID), .signedImmediateIn(signedImmediateID),
@@ -70,10 +72,11 @@ module ARM(clk, rst);
 	 		.NOut(NID), .ZOut(ZID), .COut(CID), .VOut(VID));
 
 	//Register Unit EXE to MEM
-	wire writeBackEnMEM, memReadMEM, memWriteMEM;
+	wire writeBackEnMEM, memReadMEM, memWriteMEM, pushEnMEM, popEnMEM;
 	wire[31:0] ALUResultMEM, reg2ValMEM;
 	wire[3:0] destinationMEM;
 	RegisterUnitEXE2MEM registerUnitEXE2MEM(.clk(clk), .rst(rst), .writeBackEnIn(writeBackEnEXE),
+			.pushEnIn(pushEnEXE), .popEnIn(pushEnEXE), .pushEn(pushEnMEM), .popEn(popEnMEM),
 	 		.memReadIn(memReadEXE), .memWriteIn(memWriteEXE), .ALUResultIn(ALUResultEXE),
 			.destinationIn(destinationEXE), .reg2ValIn(reg2ValEXE),
 			.writeBackEn(writeBackEnMEM), .memRead(memReadMEM), .memWrite(memWriteMEM),
@@ -90,6 +93,7 @@ module ARM(clk, rst);
 	RegisterUnitMEM2WB registerUnitMEM2WB(.clk(clk), .rst(rst), .writeBackEnIn(writeBackEnMEM),
 			.memReadIn(memReadMEM), .addressIn(ALUResultMEM), .memOutIn(memOutMEM), .destinationIn(destinationMEM),
 			.writeBackEn(writeBackEnWB), .memRead(memReadWB), .address(addressWB),
+			.pushEnIn(pushEnMEM), .popEnIn(pushEnMEM), .pushEn(pushEnWB), .popEn(popEnWB),
 			.memOut(memOutWB), .destination(destinationWB));
 
 	//Write Back

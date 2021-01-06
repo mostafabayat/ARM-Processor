@@ -1,10 +1,11 @@
 
 
-module RegisterFile(clk, rst, src1, src2, destWB, resultWB, writeBackEn, reg1, reg2);
+module RegisterFile(clk, rst, src1, src2, destWB, resultWB, writeBackEn, pushEn, popEn, reg1, reg2);
 	input wire clk, rst;
 	input wire[3:0] src1, src2, destWB;
 	input wire[31:0] resultWB;
 	input wire writeBackEn;
+	input wire pushEn, popEn;
 	output wire[31:0] reg1, reg2;
 
 	reg[31:0] regs[0:14];
@@ -20,6 +21,12 @@ module RegisterFile(clk, rst, src1, src2, destWB, resultWB, writeBackEn, reg1, r
 
 	always @(negedge clk) begin
 		if (writeBackEn) regs[destWB] <= resultWB;
+		if (pushEn) begin
+			regs[13] <= regs[13] - 4;
+		end
+		if (popEn) begin
+			regs[13] <= regs[13] + 4;
+		end
 		// regs[16'b0] = 0;
 	end
 
